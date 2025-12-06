@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ContactController extends Controller
@@ -57,6 +58,10 @@ class ContactController extends Controller
      */
     public function edit(Contact $contact): View
     {
+        if (! Gate::allows('update-contact', $contact)) {
+            abort(403);
+        }
+
         return view('contacts.edit', [
             'contact' => $contact,
         ]);
@@ -67,6 +72,10 @@ class ContactController extends Controller
      */
     public function update(Request $request, Contact $contact): RedirectResponse
     {
+        if (! Gate::allows('update-contact', $contact)) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|regex:/^[\pL\s]+$/u|max:30',
             'last_name' => 'nullable|regex:/^[\pL\s]+$/u|max:30',
